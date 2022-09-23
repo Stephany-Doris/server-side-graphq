@@ -4,11 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "stephanyD",
   "license": "ISC",
   "dependencies": {
+    "@graphql-tools/load": "^7.7.7",
+    "@graphql-tools/schema": "^9.0.4",
+    "@graphql-tools/stitch": "^8.7.11",
+    "@graphql-tools/url-loader": "^7.16.2",
+    "@graphql-tools/wrap": "^9.2.1",
+    "@whatwg-node/fetch": "^0.4.4",
     "apollo-server": "^3.10.2",
     "graphql": "^16.6.0"
   }

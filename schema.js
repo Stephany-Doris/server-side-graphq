@@ -1,4 +1,9 @@
 const { gql } = require("apollo-server");
+const { UrlLoader } = require("@graphql-tools/url-loader");
+const { mergeSchemas } = require("@graphql-tools/schema");
+const { loadSchema } = require("@graphql-tools/load");
+const { fetch } = require("@whatwg-node/fetch");
+const { print } = require("graphql");
 
 /**
  * Type Definitions for our Schema using the SDL.
@@ -64,4 +69,41 @@ const typeDefs = gql`
   }
 `;
 
-module.exports = typeDefs;
+// function remoteExecutor returns an async function
+const remoteExecutor =
+  (url) =>
+  async ({ document, variables }) => {
+    const query = print(document);
+    const fetchResult = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query, variables }),
+    });
+    return fetchResult.json();
+  };
+
+const remoteServices = [
+  { name: "Rick and Morty 🔥", url: "https://rickandmortyapi.com/graphql" },
+  {
+    name: "spaceX",
+    url: "https://api.spacex.land/graphql",
+  },
+];
+
+const buildSchemas = async (services) => {
+  const urlLoader = new UrlLoader();
+  return Promise.all(
+    services.map(async ({ url }) => {
+      const schema = await loadSchema(url, {
+        loaders: [urlLoader],
+      });
+      const schemaConfig = {
+        schema,
+        executor: remoteExecutor(url),
+      };
+      return schemaConfig;
+    })
+  );
+};
+
+module.exports = { typeDefs, buildSchemas, remoteServices };
