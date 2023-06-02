@@ -1,1 +1,1 @@
-# server-side-graphq
+# server-side-graphql
